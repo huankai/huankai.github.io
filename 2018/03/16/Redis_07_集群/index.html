@@ -1,0 +1,360 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="Huangkai,huankai"><title>Redis 集群 | HuangkaiのBlog</title><link rel="stylesheet" type="text/css" href="//fonts.neworld.org/css?family=Source+Code+Pro"><link rel="stylesheet" type="text/css" href="/css/style.css?v=2.0.1"><link rel="stylesheet" type="text/css" href="/css/highlight.css?v=2.0.1"><link rel="Shortcut Icon" href="/favicon.ico"><link rel="bookmark" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Redis 集群</h1><a id="logo" href="/.">HuangkaiのBlog</a><p class="description">学而不思则罔 思而不学则殆</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div><div id="search-form"><div id="result-mask" class="hide"></div><label><input id="search-key" type="text" autocomplete="off" placeholder="Arama"></label><div id="result-wrap" class="hide"><div id="search-result"></div></div><div class="hide"><template id="search-tpl"><div class="item"><a href="/{path}" title="{title}"><div class="title">{title}</div><div class="time">{date}</div><div class="tags">{tags}</div></a></div></template></div></div></div><div id="layout" class="layout-g"><div class="layout-l"><div class="content_container"><div class="post"><h1 class="post-title">Redis 集群</h1><div class="post-meta"><a href="/2018/03/16/Redis_07_集群/#comments" class="comment-count"></a><p><span class="date">Mar 16, 2018</span><span><i id="busuanzi_container_page_pv"><i id="busuanzi_value_page_pv"></i><i>点击</i></i></span></p></div><div class="post-content"><h1 id="一、安装环境"><a href="#一、安装环境" class="headerlink" title="一、安装环境:"></a>一、安装环境:</h1><p>操作系统: Centos Linux 7.3.1611 (Core)<br>Redis版本：4.0.1<br>Redis集群配置:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">主机名</th>
+<th style="text-align:center">Ip地址</th>
+<th style="text-align:center">端口号</th>
+<th style="text-align:center">集群端口号(<font color="red">默认为端口号 + 10000)</font></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">sjq-01</td>
+<td style="text-align:center">192.168.64.128(master)</td>
+<td style="text-align:center">6379</td>
+<td style="text-align:center">16379</td>
+</tr>
+<tr>
+<td style="text-align:center">sjq-01</td>
+<td style="text-align:center">192.168.64.128(master)</td>
+<td style="text-align:center">6380</td>
+<td style="text-align:center">16380</td>
+</tr>
+<tr>
+<td style="text-align:center">sjq-01</td>
+<td style="text-align:center">192.168.64.128(slave)</td>
+<td style="text-align:center">6381</td>
+<td style="text-align:center">16381</td>
+</tr>
+<tr>
+<td style="text-align:center">sjq-02</td>
+<td style="text-align:center">192.168.64.129(master)</td>
+<td style="text-align:center">6379</td>
+<td style="text-align:center">16379</td>
+</tr>
+<tr>
+<td style="text-align:center">sjq-02</td>
+<td style="text-align:center">192.168.64.129(slave)</td>
+<td style="text-align:center">6380</td>
+<td style="text-align:center">16380</td>
+</tr>
+<tr>
+<td style="text-align:center">sjq-02</td>
+<td style="text-align:center">192.168.64.129(slave)</td>
+<td style="text-align:center">6381</td>
+<td style="text-align:center">16381</td>
+</tr>
+</tbody>
+</table>
+<p>其中192.168.64.128:6379(master) 的 slave 为 192.168.64.129:6380 (slave)<br>192.168.64.129:6379 (master) 的 slave 为 192.168.64.128:6381 (slave)<br>192.168.64.128:6380 (master) 的 slave 为 192.168.64.129:6381 (slave)</p>
+<h1 id="二、安装Redis"><a href="#二、安装Redis" class="headerlink" title="二、安装Redis"></a>二、安装Redis</h1><p>请 <a href="https://huankai.github.io/2018/02/22/Redis_01_%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/">点击这里</a> 查看Redis的安装</p>
+<h1 id="三、创建集群"><a href="#三、创建集群" class="headerlink" title="三、创建集群"></a>三、创建集群</h1><h2 id="3-1、创建集群"><a href="#3-1、创建集群" class="headerlink" title="3.1、创建集群"></a>3.1、创建集群</h2><p>每台服务器安装 <code>ruby</code> 和 <code>rubyge    ms</code><br>使用 yum 安装 ： <font color="red"><code>yum -y install ruby rubygems</code></font><br>查看ruby 版本： <font color="red"><code>ruby -v</code></font></p>
+<p>gem 安装 redis ruby 接口 ：  <font color="red"><code>gem install redis</code></font></p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/01.png" alt=""></p>
+<p>如果出现以上错误，表示redis 4.0.1需要的ruby版本至少大于等2.2.2，而上面通过yum安装的ruby版本为2.0 。<br>解决办法如下：</p>
+<ul>
+<li>1、安装 curl :<font color="red"><code>yum -y install curl</code></font></li>
+<li>2、安装RVM:<br>先执行：<font color="red"><code>gpg2 --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3</code></font><br>再执行：<font color="red"><code>curl -L get.rvm.io | bash -s stable</code></font><br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/02.png" alt=""><br>在安装rvm时，可能会有连接不到远程服务器的问题，这要就要看你的人品了，有时候不会出现这样的问题，目录没有找到解决办法，等一会再执行，好像就可以了。</li>
+<li>3、加载配置文件：<font color="red"><code>source /usr/local/rvm/scripts/rvm</code></font></li>
+<li>4、查看rvm库中已知的ruby版本：<font color="red"><code>rvm list known</code></font></li>
+<li>5、安装一个ruby版本： <font color="red"><code>rvm install 2.3.3</code></font>  ，这里我安装的为2.3.3，只要大于2.2.2就可以</li>
+<li>6、使用一个ruby版本：<font color="red"><code>rvm use 2.3.3</code></font></li>
+<li>7、卸载一个已知版本：<font color="red"><code>rvm remove 2.0.0</code></font></li>
+<li>8、查看ruby 版本: <font color="red"><code>ruby -v</code></font> ，此时 ruby 版本成了 2.3.3</li>
+<li>9、再使用 <font color="red"><code>gem install redis</code></font> 安装ruby redis接口，就不会有上面的错误信息了</li>
+</ul>
+<p>配置Redis集群节点信息（每台服务器执行）：<br><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@sjq-02 redis-4.0.1]# <span class="keyword">mkdir</span> -p <span class="keyword">conf</span>/<span class="keyword">cluster</span>/6379</span><br><span class="line">[root@sjq-02 redis-4.0.1]# <span class="keyword">mkdir</span> -p <span class="keyword">conf</span>/<span class="keyword">cluster</span>/6380</span><br><span class="line">[root@sjq-02 redis-4.0.1]# <span class="keyword">mkdir</span> -p <span class="keyword">conf</span>/<span class="keyword">cluster</span>/6381</span><br><span class="line">[root@sjq-02 redis-4.0.1]# cp redis.<span class="keyword">conf</span> <span class="keyword">conf</span>/<span class="keyword">cluster</span>/6379/</span><br><span class="line">[root@sjq-02 redis-4.0.1]# cp redis.<span class="keyword">conf</span> <span class="keyword">conf</span>/<span class="keyword">cluster</span>/6380/</span><br><span class="line">[root@sjq-02 redis-4.0.1]# cp redis.<span class="keyword">conf</span> <span class="keyword">conf</span>/<span class="keyword">cluster</span>/6381/</span><br><span class="line">[root@sjq-02 redis-4.0.1]# <span class="keyword">cd</span> <span class="keyword">conf</span>/<span class="keyword">cluster</span>/6379/</span><br><span class="line">[root@sjq-02 6379]# ll</span><br><span class="line"><span class="keyword">total</span> 60</span><br><span class="line">-rw-r--r--. 1 root root 57764 Mar 14 11:14 redis.<span class="keyword">conf</span></span><br><span class="line">[root@sjq-02 6379]#</span><br></pre></td></tr></table></figure></p>
+<p>使用vim修改 6379目录 下的redis.conf配置信息如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>参数名称</strong></th>
+<th style="text-align:center"><strong>参数值</strong></th>
+<th style="text-align:center"><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">bind</td>
+<td style="text-align:center">192.168.64.129</td>
+<td style="text-align:center">Bind ip</td>
+</tr>
+<tr>
+<td style="text-align:center">protected-mode</td>
+<td style="text-align:center">yes</td>
+<td style="text-align:center">开启保护模式</td>
+</tr>
+<tr>
+<td style="text-align:center">port</td>
+<td style="text-align:center">6379</td>
+<td style="text-align:center">redis端口号</td>
+</tr>
+<tr>
+<td style="text-align:center">daemonize</td>
+<td style="text-align:center">yes</td>
+<td style="text-align:center">守护进程启动</td>
+</tr>
+<tr>
+<td style="text-align:center">pidfile</td>
+<td style="text-align:center">/var/run/redis_6379.pid</td>
+<td style="text-align:center">pid文件</td>
+</tr>
+<tr>
+<td style="text-align:center">dir</td>
+<td style="text-align:center">/usr/local/redis-4.0.1/conf/cluster/6379</td>
+<td style="text-align:center">数据存放目录</td>
+</tr>
+<tr>
+<td style="text-align:center">databases</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">默认为16，集群时设置一个即可</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-enabled</td>
+<td style="text-align:center">yes</td>
+<td style="text-align:center">开启集群</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-config-file</td>
+<td style="text-align:center">/usr/local/redis-4.0.1/config/cluster/6379/nodes.conf</td>
+<td style="text-align:center">集群配置文件（启动时自动生成在当前目录下，建议在6379目录下启动redis节点）</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-node-timeout</td>
+<td style="text-align:center">15000</td>
+<td style="text-align:center">节点互联超时时间，毫秒</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-migration-barrier</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">数据迁移的副本临界数，这个参数表示一个主节点在拥有多少个从节点时就要割让一个从节点给另一个没有任何从节点的主节点</td>
+</tr>
+</tbody>
+</table>
+<p>使用vim修改 6380目录 下的redis.conf配置信息如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>参数名称</strong></th>
+<th style="text-align:center"><strong>参数值</strong></th>
+<th style="text-align:center"><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">bind</td>
+<td style="text-align:center">192.168.64.129</td>
+<td style="text-align:center">Bind ip</td>
+</tr>
+<tr>
+<td style="text-align:center">protected-mode</td>
+<td style="text-align:center">yes</td>
+<td style="text-align:center">开启保护模式</td>
+</tr>
+<tr>
+<td style="text-align:center">port</td>
+<td style="text-align:center">6380</td>
+<td style="text-align:center">redis端口号</td>
+</tr>
+<tr>
+<td style="text-align:center">daemonize</td>
+<td style="text-align:center">yes</td>
+<td style="text-align:center">守护进程启动</td>
+</tr>
+<tr>
+<td style="text-align:center">pidfile</td>
+<td style="text-align:center">/var/run/redis_6380.pid</td>
+<td style="text-align:center">pid文件</td>
+</tr>
+<tr>
+<td style="text-align:center">dir</td>
+<td style="text-align:center">/usr/local/redis-4.0.1/conf/cluster/6380</td>
+<td style="text-align:center">数据存放目录</td>
+</tr>
+<tr>
+<td style="text-align:center">databases</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">默认为16，集群时设置一个即可</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-enabled</td>
+<td style="text-align:center">yes</td>
+<td style="text-align:center">开启集群</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-config-file</td>
+<td style="text-align:center">/usr/local/redis-4.0.1/config/cluster/6380/nodes.conf</td>
+<td style="text-align:center">集群配置文件（启动时自动生成在当前目录下，建议在6379目录下启动redis节点）</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-node-timeout</td>
+<td style="text-align:center">15000</td>
+<td style="text-align:center">节点互联超时时间，毫秒</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-migration-barrier</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">数据迁移的副本临界数，这个参数表示一个主节点在拥有多少个从节点时就要割让一个从节点给另一个没有任何从节点的主节点</td>
+</tr>
+</tbody>
+</table>
+<p>使用vim修改 6381目录 下的redis.conf配置信息如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>参数名称</strong></th>
+<th style="text-align:center"><strong>参数值</strong></th>
+<th style="text-align:center"><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">bind</td>
+<td style="text-align:center">192.168.64.129</td>
+<td style="text-align:center">Bind ip</td>
+</tr>
+<tr>
+<td style="text-align:center">protected-mode</td>
+<td style="text-align:center">yes</td>
+<td style="text-align:center">开启保护模式</td>
+</tr>
+<tr>
+<td style="text-align:center">port</td>
+<td style="text-align:center">6381</td>
+<td style="text-align:center">redis端口号</td>
+</tr>
+<tr>
+<td style="text-align:center">daemonize</td>
+<td style="text-align:center">yes</td>
+<td style="text-align:center">守护进程启动</td>
+</tr>
+<tr>
+<td style="text-align:center">pidfile</td>
+<td style="text-align:center">/var/run/redis_6381.pid</td>
+<td style="text-align:center">pid文件</td>
+</tr>
+<tr>
+<td style="text-align:center">dir</td>
+<td style="text-align:center">/usr/local/redis-4.0.1/conf/cluster/6380</td>
+<td style="text-align:center">数据存放目录</td>
+</tr>
+<tr>
+<td style="text-align:center">databases</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">默认为16，集群时设置一个即可</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-enabled</td>
+<td style="text-align:center">yes</td>
+<td style="text-align:center">开启集群</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-config-file</td>
+<td style="text-align:center">/usr/local/redis-4.0.1/config/cluster/6381/nodes.conf</td>
+<td style="text-align:center">集群配置文件（启动时自动生成在当前目录下，建议在6379目录下启动redis节点）</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-node-timeout</td>
+<td style="text-align:center">15000</td>
+<td style="text-align:center">节点互联超时时间，毫秒</td>
+</tr>
+<tr>
+<td style="text-align:center">cluster-migration-barrier</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">数据迁移的副本临界数，这个参数表示一个主节点在拥有多少个从节点时就要割让一个从节点给另一个没有任何从节点的主节点</td>
+</tr>
+</tbody>
+</table>
+<p>分别在每台服务器上启动redis服务：<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@sjq<span class="number">-02</span> <span class="number">6379</span>]# /usr/local/redis<span class="number">-4.0</span><span class="number">.1</span>/bin/redis-server ./redis.conf</span><br><span class="line">[root@sjq<span class="number">-02</span> <span class="number">6380</span>]# /usr/local/redis<span class="number">-4.0</span><span class="number">.1</span>/bin/redis-server ./redis.conf</span><br><span class="line">[root@sjq<span class="number">-02</span> <span class="number">6381</span>]# /usr/local/redis<span class="number">-4.0</span><span class="number">.1</span>/bin/redis-server ./redis.conf</span><br></pre></td></tr></table></figure></p>
+<p>可以使用 <font color="red"><code>ps aux|grep redis</code></font> 查看服务是否正常启动。</p>
+<p>执行Redis 集群创建命令（<font color="red"><strong>只需要在其中一个节点上执行一次即可</strong></font>）<br><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[root@sjq-<span class="number">02</span> ~]$ cd /usr/local/redis-<span class="number">4.0</span><span class="meta">.1</span>/</span><br><span class="line">[root@sjq-<span class="number">02</span> redis-<span class="number">4.0</span><span class="meta">.1</span>]#  cp /usr/local/redis-<span class="number">4.0</span><span class="meta">.1</span>/src/redis-trib.rb /usr/local/bin/redis-trib</span><br><span class="line">[root@sjq-<span class="number">01</span> <span class="number">6379</span>]# redis-trib create --replicas <span class="number">1</span> <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6379</span> <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6379</span> <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6380</span> <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6380</span> <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6381</span>  <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6381</span></span><br><span class="line">&gt;&gt;&gt; Creating cluster</span><br><span class="line">&gt;&gt;&gt; Performing hash slots allocation on <span class="number">6</span> nodes...</span><br><span class="line">Using <span class="number">3</span> masters:</span><br><span class="line"><span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6379</span></span><br><span class="line"><span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6379</span></span><br><span class="line"><span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6380</span></span><br><span class="line">Adding replica <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6380</span> to <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6379</span></span><br><span class="line">Adding replica <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6381</span> to <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6379</span></span><br><span class="line">Adding replica <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6381</span> to <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6380</span></span><br><span class="line"><span class="symbol">M:</span> f1a1123ca63ed4864a166b34252568ae68b7f79c <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6379</span></span><br><span class="line"><span class="symbol">   slots:</span><span class="number">0</span>-<span class="number">5460</span> (<span class="number">5461</span> slots) master</span><br><span class="line"><span class="symbol">M:</span> fd8a224b4f220fd4f944fd1b3c743c548ac7eeb3 <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6379</span></span><br><span class="line"><span class="symbol">   slots:</span><span class="number">5461</span>-<span class="number">10922</span> (<span class="number">5462</span> slots) master</span><br><span class="line"><span class="symbol">M:</span> e0a135a0708e9c2ec51dff0080cffe9ba4983fe2 <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6380</span></span><br><span class="line"><span class="symbol">   slots:</span><span class="number">10923</span>-<span class="number">16383</span> (<span class="number">5461</span> slots) master</span><br><span class="line"><span class="symbol">S:</span> c4f8d1ef105b8285132003e0bc6067c5e5195bc4 <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6380</span></span><br><span class="line">   replicates f1a1123ca63ed4864a166b34252568ae68b7f79c</span><br><span class="line"><span class="symbol">S:</span> c5861fd86db135dd19bf5b48f7f15343b1844833 <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6381</span></span><br><span class="line">   replicates fd8a224b4f220fd4f944fd1b3c743c548ac7eeb3</span><br><span class="line"><span class="symbol">S:</span> 380b1f8cd50ab6f295a8f53ef25f46f424ae8c4d <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6381</span></span><br><span class="line">   replicates e0a135a0708e9c2ec51dff0080cffe9ba4983fe2</span><br><span class="line">Can I set the above configuration? (type <span class="string">'yes'</span> to accept): yes</span><br></pre></td></tr></table></figure></p>
+<p>如上所示：主节点(M)分别为:<br>192.168.64.128:637 ，哈希槽为(0-5460)<br>192.168.64.129:6379 ，哈希槽为(5461-10922)<br>192.168.64.128:6380 ，哈希槽为(10923-16383)<br>从节点(S)分别为：192.168.64.129:6380、192.168.64.128:6381、192.168.64.129:6381</p>
+<p>创建集群时会自动分配主从节点，如果你觉得上面的主从节点不是你想要的，可以 ctrl + c 退出交互模式，交换上面创建集群命令的ip地址的位置，如果是你想要的，输入 <font color="red"><strong>yes</strong></font> ，回车，开始创建集群，信息如下：<br><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">Can</span> <span class="selector-tag">I</span> <span class="selector-tag">set</span> <span class="selector-tag">the</span> <span class="selector-tag">above</span> <span class="selector-tag">configuration</span>? (type <span class="string">'yes'</span> to accept): <span class="selector-tag">yes</span></span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">Nodes</span> <span class="selector-tag">configuration</span> <span class="selector-tag">updated</span></span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">Assign</span> <span class="selector-tag">a</span> <span class="selector-tag">different</span> <span class="selector-tag">config</span> <span class="selector-tag">epoch</span> <span class="selector-tag">to</span> <span class="selector-tag">each</span> <span class="selector-tag">node</span></span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">Sending</span> <span class="selector-tag">CLUSTER</span> <span class="selector-tag">MEET</span> <span class="selector-tag">messages</span> <span class="selector-tag">to</span> <span class="selector-tag">join</span> <span class="selector-tag">the</span> <span class="selector-tag">cluster</span></span><br><span class="line"><span class="selector-tag">Waiting</span> <span class="selector-tag">for</span> <span class="selector-tag">the</span> <span class="selector-tag">cluster</span> <span class="selector-tag">to</span> <span class="selector-tag">join</span>..</span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">Performing</span> <span class="selector-tag">Cluster</span> <span class="selector-tag">Check</span> (using node <span class="number">192.168</span>.<span class="number">64.128</span>:<span class="number">6379</span>)</span><br><span class="line"><span class="selector-tag">M</span>: <span class="selector-tag">f1a1123ca63ed4864a166b34252568ae68b7f79c</span> <span class="selector-tag">192</span><span class="selector-class">.168</span><span class="selector-class">.64</span><span class="selector-class">.128</span><span class="selector-pseudo">:6379</span></span><br><span class="line">   <span class="selector-tag">slots</span><span class="selector-pseudo">:0-5460</span> (<span class="number">5461</span> slots) <span class="selector-tag">master</span></span><br><span class="line">   <span class="selector-tag">1</span> <span class="selector-tag">additional</span> <span class="selector-tag">replica</span>(s)</span><br><span class="line"><span class="selector-tag">S</span>: <span class="selector-tag">c4f8d1ef105b8285132003e0bc6067c5e5195bc4</span> <span class="selector-tag">192</span><span class="selector-class">.168</span><span class="selector-class">.64</span><span class="selector-class">.129</span><span class="selector-pseudo">:6380</span></span><br><span class="line">   <span class="selector-tag">slots</span>: (<span class="number">0</span> slots) <span class="selector-tag">slave</span></span><br><span class="line">   <span class="selector-tag">replicates</span> <span class="selector-tag">f1a1123ca63ed4864a166b34252568ae68b7f79c</span></span><br><span class="line"><span class="selector-tag">S</span>: <span class="selector-tag">380b1f8cd50ab6f295a8f53ef25f46f424ae8c4d</span> <span class="selector-tag">192</span><span class="selector-class">.168</span><span class="selector-class">.64</span><span class="selector-class">.129</span><span class="selector-pseudo">:6381</span></span><br><span class="line">   <span class="selector-tag">slots</span>: (<span class="number">0</span> slots) <span class="selector-tag">slave</span></span><br><span class="line">   <span class="selector-tag">replicates</span> <span class="selector-tag">e0a135a0708e9c2ec51dff0080cffe9ba4983fe2</span></span><br><span class="line"><span class="selector-tag">M</span>: <span class="selector-tag">e0a135a0708e9c2ec51dff0080cffe9ba4983fe2</span> <span class="selector-tag">192</span><span class="selector-class">.168</span><span class="selector-class">.64</span><span class="selector-class">.128</span><span class="selector-pseudo">:6380</span></span><br><span class="line">   <span class="selector-tag">slots</span><span class="selector-pseudo">:10923-16383</span> (<span class="number">5461</span> slots) <span class="selector-tag">master</span></span><br><span class="line">   <span class="selector-tag">1</span> <span class="selector-tag">additional</span> <span class="selector-tag">replica</span>(s)</span><br><span class="line"><span class="selector-tag">M</span>: <span class="selector-tag">fd8a224b4f220fd4f944fd1b3c743c548ac7eeb3</span> <span class="selector-tag">192</span><span class="selector-class">.168</span><span class="selector-class">.64</span><span class="selector-class">.129</span><span class="selector-pseudo">:6379</span></span><br><span class="line">   <span class="selector-tag">slots</span><span class="selector-pseudo">:5461-10922</span> (<span class="number">5462</span> slots) <span class="selector-tag">master</span></span><br><span class="line">   <span class="selector-tag">1</span> <span class="selector-tag">additional</span> <span class="selector-tag">replica</span>(s)</span><br><span class="line"><span class="selector-tag">S</span>: <span class="selector-tag">c5861fd86db135dd19bf5b48f7f15343b1844833</span> <span class="selector-tag">192</span><span class="selector-class">.168</span><span class="selector-class">.64</span><span class="selector-class">.128</span><span class="selector-pseudo">:6381</span></span><br><span class="line">   <span class="selector-tag">slots</span>: (<span class="number">0</span> slots) <span class="selector-tag">slave</span></span><br><span class="line">   <span class="selector-tag">replicates</span> <span class="selector-tag">fd8a224b4f220fd4f944fd1b3c743c548ac7eeb3</span></span><br><span class="line"><span class="selector-attr">[OK]</span> <span class="keyword">All</span> <span class="selector-tag">nodes</span> <span class="selector-tag">agree</span> <span class="selector-tag">about</span> <span class="selector-tag">slots</span> <span class="selector-tag">configuration</span>.</span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">Check</span> <span class="selector-tag">for</span> <span class="selector-tag">open</span> <span class="selector-tag">slots</span>...</span><br><span class="line">&gt;&gt;&gt; <span class="selector-tag">Check</span> <span class="selector-tag">slots</span> <span class="selector-tag">coverage</span>...</span><br><span class="line"><span class="selector-attr">[OK]</span> <span class="keyword">All</span> <span class="selector-tag">16384</span> <span class="selector-tag">slots</span> <span class="selector-tag">covered</span>.</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-2、创建集群过程说明："><a href="#3-2、创建集群过程说明：" class="headerlink" title="3.2、创建集群过程说明："></a>3.2、创建集群过程说明：</h2><ul>
+<li>给定的<font color="red"><code>redis-trib</code></font> 程序的命令为 <font color="red"><code>create</code></font> ,这表示创建一个新的集群；</li>
+<li><font color="red"><code>--replicas 1</code></font> 表示每个主节点下有一个从节点；</li>
+<li>之后跟着其它参数则是实例的地址列表，程序会使用这些地址的实例创建集群。接着，redis-trib会打印一些预想中的配置给你看，如果你觉得没问题，就可以输入 yes，redis-trib 就会将这份配置应用到集群中。</li>
+</ul>
+<p>查看集群状（可以在任意一台节点上查看）：<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/03.png" alt=""><br>从上图可以看出，每个集群的主、从节点、以及每个master节点的哈希槽 redis-cluster把所有的物理节点映射到 【0-16383】个slot(哈希槽)上，cluster负责维护 node<->slot<->value</-></-></p>
+<h2 id="3-3、集群高可用测试："><a href="#3-3、集群高可用测试：" class="headerlink" title="3.3、集群高可用测试："></a>3.3、集群高可用测试：</h2><h3 id="3-3-1、重建集群步骤"><a href="#3-3-1、重建集群步骤" class="headerlink" title="3.3.1、重建集群步骤"></a>3.3.1、重建集群步骤</h3><p>网上的说法是删除每个节点的nodes.conf、appendonly.aof、dump.rdb文件，再重启每个节点，使用 redis-trib create 命令创建集群，此种方式不能在生产环境中使用，如果删除这些文件, 持久化的数据都不存在，这在生产环境是非常危险的。<br>正确做法是关闭所有集群节点，直接启动每个节点即可，不要删除nodes.conf 、appendonly.aof 、dump.rdb文件，重启redis后将自动加入到集群中。</p>
+<h3 id="3-3-2、查看当前集群各节点的状态："><a href="#3-3-2、查看当前集群各节点的状态：" class="headerlink" title="3.3.2、查看当前集群各节点的状态："></a>3.3.2、查看当前集群各节点的状态：</h3><p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/04.png" alt=""></p>
+<h3 id="3-3-3、redis-trib-rb命令参数说明："><a href="#3-3-3、redis-trib-rb命令参数说明：" class="headerlink" title="3.3.3、redis-trib.rb命令参数说明："></a>3.3.3、redis-trib.rb命令参数说明：</h3><ul>
+<li><font color="red"><strong>call</strong></font> : 执行redis命令</li>
+<li><font color="red"><strong>create</strong></font>：创建一个新的集群</li>
+<li><font color="red"><strong>add-node</strong></font>:将一个节点添加到集群中，第一个是新节点ip:port ，第二个是任意一个已存在节点 ip:port，如将新节点192.168.64.135:6379添加到集群中：<br>redis-trib add-node 192.168.64.135:6379 192.168.64.128:6379</li>
+<li><font color="red"><strong>reshard</strong></font>:重新分片</li>
+<li><font color="red"><strong>check</strong></font>:查看集群信息</li>
+<li><font color="red"><strong>del-node</strong></font>:移除一个节点</li>
+</ul>
+<h1 id="四、为集群添加新节点："><a href="#四、为集群添加新节点：" class="headerlink" title="四、为集群添加新节点："></a>四、为集群添加新节点：</h1><p>在 192.168.64.135上安装 redis，步骤如上，并启动两个redis实例：192.168.64.135:6379（master） 和192.168.64.135:6380（slave）</p>
+<h2 id="4-1、添加主节点"><a href="#4-1、添加主节点" class="headerlink" title="4.1、添加主节点"></a>4.1、添加主节点</h2><p>在任意一台redis集群服务器上使用 add-node 将一个节点添加到集群中<br><figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/redis-4.0.1/src/redis-trib.rb<span class="built_in"> add-node </span>192.168.64.135:6379 192.168.64.128:6379</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/05.png" alt=""></p>
+<p>执行上面的命令，就会添加新的节点到集群中，新的节点不包含任何数据，因为它没有分配 slot(哈希槽),默认新添加的节点是master(主)节点，当集群需要将某个从节点升级为新的主节点时，这个新节点不会被选中。</p>
+<p>为新节点添加slot(哈希槽)：<br>只需要指定集群中一个节点的地址，redis-trib 就会自动找到集群中的其他节点信息，目前，redis-trib只能在管理员的协助下完成重新分片的工作，命令如下：<br><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/redis-<span class="number">4.0</span><span class="meta">.1</span>/src/redis-trib.rb reshard <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.129</span>:<span class="number">6379</span></span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/06.png" alt=""></p>
+<p>上面的会询问你需要移动多少个哈希槽(slot) ，从 1 – 16384，这里输入 500。</p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/07.png" alt=""></p>
+<p>上面又会询问你接收的节点 id是哪个，很显然这个节点id为刚添加的新节点id，可以连接redis集群查看如下：</p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/08.png" alt=""><br>新添加的节点为 红色框部分，解读如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">参数</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">63f13eba35c50dc8503bebad513f4265368c7aa4</td>
+<td style="text-align:center">节点id</td>
+</tr>
+<tr>
+<td style="text-align:center">192.168.64.135:6379@16379</td>
+<td style="text-align:center">主机ip:端口号@集群链接端口号</td>
+</tr>
+<tr>
+<td style="text-align:center">master</td>
+<td style="text-align:center">表示为主节点</td>
+</tr>
+<tr>
+<td style="text-align:center">-</td>
+<td style="text-align:center">如果该节点为master,以 – 表示，如果为 slave（从节点）, 则为该节点的master id</td>
+</tr>
+<tr>
+<td style="text-align:center">connected  0-5460</td>
+<td style="text-align:center">如果connected后面有数字，表示为主节点的哈希槽，只有master的connected才有可能有哈希槽的值，slave不会有</td>
+</tr>
+</tbody>
+</table>
+<p>很显然，在上面应该输入新增加节点的id 即: 63f13eba35c50dc8503bebad513f4265368c7aa4<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/09.png" alt=""></p>
+<p>又会询问，需要从哪些节点分配 ，如果输入<strong>all</strong> ，会将每个 master节点分配500个哈希槽到新的节点上，你也可以指定输入想要从哪些节点移动到新节点的master id，然后输入 <strong>done</strong> 完成。这里我输入 <strong>all</strong> 。<br>然后就给你列出一些移动哈希槽的计划列表，如果没有问题，输入<strong>yes</strong>  即可<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/10.png" alt=""></p>
+<p>再查看集群节点信息如下：我们可以发现此时 192.168.64.135:6379 节点下有哈希槽了，主节点添加成功。</p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/11.png" alt=""></p>
+<h2 id="4-2、添加从节点"><a href="#4-2、添加从节点" class="headerlink" title="4.2、添加从节点"></a>4.2、添加从节点</h2><p>先在任意一台中集群节点服务上执行以下命令将新的节点添加到集群中：<br><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># /usr/local/redis-<span class="number">4.0</span><span class="meta">.1</span>/src/redis-trib.rb <span class="keyword">add</span>-node <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.135</span>:<span class="number">6380</span> <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.128</span>:<span class="number">6379</span></span><br></pre></td></tr></table></figure></p>
+<p>查看节点信息如下：<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/12.png" alt=""></p>
+<p>新添加的节点默认为主节点，将新节点设置为192.168.64.135：6379的 从节点，操作如下：<br>使用redis-cli 连接上新节点的shell，输入命令：<font color="red"><strong>cluster replicate</strong></font> 对应master的节点id<br><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@sjq-<span class="number">09</span> <span class="number">6379</span>]# /usr/local/redis-<span class="number">4.0</span><span class="meta">.1</span>/bin/redis-<span class="keyword">cli</span> -c -h <span class="number">192.168</span><span class="meta">.64</span><span class="meta">.135</span> -p <span class="number">6380</span></span><br><span class="line"><span class="number">192.168</span><span class="meta">.64</span><span class="meta">.135</span>:<span class="number">6380</span>&gt; cluster replicate 63f13eba35c50dc8503bebad513f4265368c7aa4</span><br><span class="line">OK</span><br><span class="line"><span class="number">192.168</span><span class="meta">.64</span><span class="meta">.135</span>:<span class="number">6380</span>&gt;</span><br></pre></td></tr></table></figure></p>
+<p>查看集群节点信息如下，此时192.168.64.135:6380(slave)的主节点为192.168.64.135:6379<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/13.png" alt=""></p>
+<p>注意：<br>在线添加slave时，需要 dump 整个master进程，并传递到slave，再由slave加载rdb文件到内存，rdb传输过程中master可能无法提供服务，整个过程消耗大量IO,要小心操作，最好在服务器访问量小的时候进行。</p>
+<h1 id="五、为集群删除节点"><a href="#五、为集群删除节点" class="headerlink" title="五、为集群删除节点"></a>五、为集群删除节点</h1><h2 id="5-1-删除slave节点："><a href="#5-1-删除slave节点：" class="headerlink" title="5.1    删除slave节点："></a>5.1    删除slave节点：</h2><p>使用 <font color="red"><strong>redis-trib del-node</strong></font> 节点ip:port 节点id 删除：<br>删除192.168.64.135:6380节点，删除节点后，也会将该节点服务停用。<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/14.png" alt=""></p>
+<p>查看集群节点信息如下，可知删除的节点已不在集群中：<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/15.png" alt=""></p>
+<h2 id="5-2、删除master节点："><a href="#5-2、删除master节点：" class="headerlink" title="5.2、删除master节点："></a>5.2、删除master节点：</h2><p>删除主节点之前，需要先使用 reshard移除该 master 的全部slot(哈希槽),然后再删除当前节点，（目前只能将删除的master的slot迁移到一个节点上），操作方式与配置slot类似，指定具体的Source node即可。下面以删除192.168.64.135:6379节点为例说明：<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/16.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/17.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/18.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/19.png" alt=""></p>
+<p>再次查看节点信息如下，发现 192.168.64.135:6379没有了哈希槽(slot)</p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/20.png" alt=""></p>
+<p>此时，我们就可以删除节点了</p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/21.png" alt=""></p>
+<p>再次查看节点信息，发现 192.168.64.135:6379 这个节点已不在集群中。</p>
+<p><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Redis/cluster/22.png" alt=""></p>
+<h1 id="六、为集群添加密码授权"><a href="#六、为集群添加密码授权" class="headerlink" title="六、为集群添加密码授权"></a>六、为集群添加密码授权</h1><p>方式一：为集群添加密码授权<br>在每个redis服务的redis.conf 添加内容如下：<br><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">requirepass <span class="number">1234567</span></span><br></pre></td></tr></table></figure></p>
+<p>说明：这种方式需要重新启动各节点</p>
+<p>方式二： 进入各个实例进行设置<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./redis-cli -c -h 192.168.64.128 -p 6379</span><br><span class="line">config <span class="builtin-name">set</span> requirepass 1234567 </span><br><span class="line">config rewrite</span><br></pre></td></tr></table></figure></p>
+<p>注意：各个节点密码都必须一致，否则Redirected就会失败，推荐这种方式，这种方式会把密码写入到redis.conf里面去，且不用重启。</p>
+<p>设置密码之后如果需要使用redis-trib.rb的各种命令，如下：<br><figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis-trib.rb<span class="built_in"> check </span>192.168.64.128</span><br><span class="line">[ERR] Sorry, can’t connect to node 192.168.64.128:6379</span><br></pre></td></tr></table></figure></p>
+<p>上面会报错，解决方法：</p>
+<p><font color="red"><code>vim /usr/local/rvm/gems/ruby-2.3.3/gems/redis-4.0.1/lib/redis/client.rb</code></font> ,找到password,并修改password为上面配置的密码即可<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Redis</span></span></span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Client</span></span></span><br><span class="line"></span><br><span class="line">    DEFAULTS = &#123;</span><br><span class="line">      <span class="symbol">:url</span> =&gt; lambda &#123; ENV[<span class="string">"REDIS_URL"</span>] &#125;,</span><br><span class="line">      <span class="symbol">:scheme</span> =&gt; <span class="string">"redis"</span>,</span><br><span class="line">      <span class="symbol">:host</span> =&gt; <span class="string">"127.0.0.1"</span>,</span><br><span class="line">      <span class="symbol">:port</span> =&gt; <span class="number">6379</span>,</span><br><span class="line">      <span class="symbol">:path</span> =&gt; <span class="literal">nil</span>,</span><br><span class="line">      <span class="symbol">:timeout</span> =&gt; <span class="number">5.0</span>,</span><br><span class="line">      <span class="symbol">:password</span> =&gt; <span class="string">"1234567"</span>,</span><br><span class="line">      <span class="symbol">:db</span> =&gt; <span class="number">0</span>,</span><br><span class="line">      <span class="symbol">:driver</span> =&gt; <span class="literal">nil</span>,</span><br><span class="line">      <span class="symbol">:id</span> =&gt; <span class="literal">nil</span>,</span><br><span class="line">      <span class="symbol">:tcp_keepalive</span> =&gt; <span class="number">0</span>,</span><br><span class="line">      <span class="symbol">:reconnect_attempts</span> =&gt; <span class="number">1</span>,</span><br><span class="line">      <span class="symbol">:inherit_socket</span> =&gt; <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">attr_reader</span> <span class="symbol">:options</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">scheme</span></span></span><br><span class="line">      @options[<span class="symbol">:scheme</span>]</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">host</span></span></span><br><span class="line">      @options[<span class="symbol">:host</span>]</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">port</span></span></span><br><span class="line">      @options[<span class="symbol">:port</span>]</span><br><span class="line">    <span class="keyword">end</span></span><br></pre></td></tr></table></figure></p>
+<p>网上找资料说还需要在每个节点上配置 <font color="red">masterauth</font> 的密码，其实不用，本人亲测，<font color="red">masterauth</font> 这个参数有没有都不会影响到集群，就算每个节点配置的<font color="red">masterauth</font> 不一样也能正常使用，但 <font color="red">requirepass</font> 这个就必须得一样了，并且修改<font color="red">vim /usr/local/rvm/gems/ruby-2.3.3/gems/redis-4.0.1/lib/redis/client.rb</font>这个文件的password的值也是配置文件中 requirepass 参数的值。 官网说的很详细，<font color="red">masterauth</font> 这个参数是配置主从复制中需要认证的参数。</p>
+</div><div class="tags"><a href="/tags/Redis/">Redis</a></div><div class="post-share"><div class="bdsharebuttonbox"><span style="float:left;line-height: 28px;height: 28px;font-size:16px;font-weight:blod">分享到：</span><a href="#" data-cmd="more" class="bds_more"></a><a href="#" data-cmd="mshare" title="分享到一键分享" class="bds_mshare"></a><a href="#" data-cmd="fbook" title="分享到Facebook" class="bds_fbook"></a><a href="#" data-cmd="twi" title="分享到Twitter" class="bds_twi"></a><a href="#" data-cmd="linkedin" title="分享到linkedin" class="bds_linkedin"></a><a href="#" data-cmd="youdao" title="分享到有道云笔记" class="bds_youdao"></a><a href="#" data-cmd="evernotecn" title="分享到印象笔记" class="bds_evernotecn"></a><a href="#" data-cmd="weixin" title="分享到微信" class="bds_weixin"></a><a href="#" data-cmd="qzone" title="分享到QQ空间" class="bds_qzone"></a><a href="#" data-cmd="tsina" title="分享到新浪微博" class="bds_tsina"></a></div></div><div class="post-nav"><a href="/2018/02/28/Docker/" class="next">Docker</a></div><div id="comments"></div></div></div></div><div class="layout-r"><div id="sidebar"><div class="search-pla"></div><div id="toc" class="widget"><div class="widget-title"><i class="fa fa-fei">文章目录</i></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#一、安装环境"><span class="toc-text">一、安装环境:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#二、安装Redis"><span class="toc-text">二、安装Redis</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#三、创建集群"><span class="toc-text">三、创建集群</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1、创建集群"><span class="toc-text">3.1、创建集群</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2、创建集群过程说明："><span class="toc-text">3.2、创建集群过程说明：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3、集群高可用测试："><span class="toc-text">3.3、集群高可用测试：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-1、重建集群步骤"><span class="toc-text">3.3.1、重建集群步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-2、查看当前集群各节点的状态："><span class="toc-text">3.3.2、查看当前集群各节点的状态：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-3、redis-trib-rb命令参数说明："><span class="toc-text">3.3.3、redis-trib.rb命令参数说明：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#四、为集群添加新节点："><span class="toc-text">四、为集群添加新节点：</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1、添加主节点"><span class="toc-text">4.1、添加主节点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2、添加从节点"><span class="toc-text">4.2、添加从节点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#五、为集群删除节点"><span class="toc-text">五、为集群删除节点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-删除slave节点："><span class="toc-text">5.1    删除slave节点：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2、删除master节点："><span class="toc-text">5.2、删除master节点：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#六、为集群添加密码授权"><span class="toc-text">六、为集群添加密码授权</span></a></li></ol></div><div class="widget"><div class="widget-title"><i class="fa fa-xie"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/03/16/Redis_07_集群/">Redis 集群</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/28/Docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/SpringCloud_01_Eureka/">Spring Cloud Eureka 服务发现</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Git/">Git 环境搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Thymeleaf_01/">Thymeleaf 教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Svn服务器搭建/">Linux Svn 服务器搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Spring_Boot_01/">Spring Boot 快速入门 - 1 分钟搭建 Web 应用</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Spring_Boot_02/">Spring Boot 添加 Thymeleaf 支持</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/SecureCRT_8_1/">SecureCRT 8.1 安装与破解</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Redis_05_事务/">Redis 事务</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-biao"> 标签</i></div><div class="tagcloud"><a href="/tags/Nginx/" style="font-size: 15px;">Nginx</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/JPA/" style="font-size: 15px;">JPA</a> <a href="/tags/Idea/" style="font-size: 15px;">Idea</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Mac/" style="font-size: 15px;">Mac</a> <a href="/tags/MySql/" style="font-size: 15px;">MySql</a> <a href="/tags/Git/" style="font-size: 15px;">Git</a> <a href="/tags/Redis/" style="font-size: 15px;">Redis</a> <a href="/tags/Tool/" style="font-size: 15px;">Tool</a> <a href="/tags/Spring-Cloud/" style="font-size: 15px;">Spring Cloud</a> <a href="/tags/Spring-Boot/" style="font-size: 15px;">Spring-Boot</a> <a href="/tags/Thymeleaf/" style="font-size: 15px;">Thymeleaf</a> <a href="/tags/Svn/" style="font-size: 15px;">Svn</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-archive"> 归档</i></div><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li></ul></div></div></div></div><a id="totop" href="#top"></a><div id="footer"><div class="footer-info"><p><a href="/baidusitemap.xml">Baidu Site Haritası</a> |  <a href="/atom.xml">订阅</a> |  <a href="/about/">关于</a></p><p>本站总访问量：<i id="busuanzi_container_site_pv"><i id="busuanzi_value_site_pv"></i></i>次</p><p><span> Copyright &copy;<a href="/." rel="nofollow">Huangkai.</a></span><span> Theme by<a rel="nofollow" target="_blank" href="https://github.com/chaooo/hexo-theme-BlueLake"> BlueLake.</a></span><span> Count by<a href="http://busuanzi.ibruce.info/"> busuanzi.</a></span><span> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a></span></p></div></div></div><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><script type="text/javascript" src="/js/search.json.js?v=2.0.1"></script><script type="text/javascript" src="/js/toctotop.js?v=2.0.1" async></script><script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":["mshare","weixin","tsina","qzone","linkedin","fbook","twi","print","renren","sqq","evernotecn","bdysc","tqq","tqf","bdxc","kaixin001","tieba","douban","bdhome","thx","ibaidu","meilishuo","mogujie","diandian","huaban","duitang","hx","fx","youdao","sdo","qingbiji","people","xinhua","mail","isohu","yaolan","wealink","ty","iguba","h163","copy"],"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{},"image":{"viewList":["tsina","qzone","weixin","fbook","twi","linkedin","youdao","evernotecn","mshare"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["tsina","qzone","weixin","fbook","twi","linkedin","youdao","evernotecn","mshare"]}};with(document)0[(getElementsByTagName('head')[0]||head).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script></body></html>
