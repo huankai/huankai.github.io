@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="Huangkai,huankai"><title>htop | HuangkaiのBlog</title><link rel="stylesheet" type="text/css" href="//fonts.neworld.org/css?family=Source+Code+Pro"><link rel="stylesheet" type="text/css" href="/css/style.css?v=2.0.1"><link rel="stylesheet" type="text/css" href="/css/highlight.css?v=2.0.1"><link rel="Shortcut Icon" href="/favicon.ico"><link rel="bookmark" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">htop</h1><a id="logo" href="/.">HuangkaiのBlog</a><p class="description">学而不思则罔 思而不学则殆</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div><div id="search-form"><div id="result-mask" class="hide"></div><label><input id="search-key" type="text" autocomplete="off" placeholder="Arama"></label><div id="result-wrap" class="hide"><div id="search-result"></div></div><div class="hide"><template id="search-tpl"><div class="item"><a href="/{path}" title="{title}"><div class="title">{title}</div><div class="time">{date}</div><div class="tags">{tags}</div></a></div></template></div></div></div><div id="layout" class="layout-g"><div class="layout-l"><div class="content_container"><div class="post"><h1 class="post-title">htop</h1><div class="post-meta"><a href="/2018/04/23/常用命令_htop/#comments" class="comment-count"></a><p><span class="date">Apr 23, 2018</span><span><i id="busuanzi_container_page_pv"><i id="busuanzi_value_page_pv"></i><i>点击</i></i></span></p></div><div class="post-content"><p>htp 的界面字符解释和 top 差不多，可以参照:</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>安装环境 ：Centos 7</p>
+<p>安装扩展源:<strong>sudo yum install epel-release</strong><br>安装top:<strong>sudo yum install htop</strong></p>
+<p>安装完成后，在命令行执行 <code>htop</code> 如下：<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Linux/htop_01.png" alt=""></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字符</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>F1 Help</code></td>
+<td style="text-align:center">帮助</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>F2 Setup</code></td>
+<td style="text-align:center">设置（可以设置显示的参数，方式等</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>F3 Search</code></td>
+<td style="text-align:center">搜索(光标跳到含有输入字符的行)</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>F4 Filter</code></td>
+<td style="text-align:center">筛选（只保留完全匹配输入字符的行）</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>F5 Tree</code></td>
+<td style="text-align:center">查看进程数(和pstree差不多)</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>F6 Sorted</code></td>
+<td style="text-align:center">排序</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>F7 Nice -</code></td>
+<td style="text-align:center">增加优先级</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>F8 Nice +</code></td>
+<td style="text-align:center">减少优先级</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>F9 Kill</code></td>
+<td style="text-align:center">杀死进程，默认信号15</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>F10 Quit</code></td>
+<td style="text-align:center">退出</td>
+</tr>
+</tbody>
+</table>
+</div><div class="tags"><a href="/tags/Linux/">Linux</a></div><div class="post-share"><div class="bdsharebuttonbox"><span style="float:left;line-height: 28px;height: 28px;font-size:16px;font-weight:blod">分享到：</span><a href="#" data-cmd="more" class="bds_more"></a><a href="#" data-cmd="mshare" title="分享到一键分享" class="bds_mshare"></a><a href="#" data-cmd="fbook" title="分享到Facebook" class="bds_fbook"></a><a href="#" data-cmd="twi" title="分享到Twitter" class="bds_twi"></a><a href="#" data-cmd="linkedin" title="分享到linkedin" class="bds_linkedin"></a><a href="#" data-cmd="youdao" title="分享到有道云笔记" class="bds_youdao"></a><a href="#" data-cmd="evernotecn" title="分享到印象笔记" class="bds_evernotecn"></a><a href="#" data-cmd="weixin" title="分享到微信" class="bds_weixin"></a><a href="#" data-cmd="qzone" title="分享到QQ空间" class="bds_qzone"></a><a href="#" data-cmd="tsina" title="分享到新浪微博" class="bds_tsina"></a></div></div><div class="post-nav"><a href="/2018/04/23/常用命令_top/" class="pre">Linux常用命令(top)</a><a href="/2018/03/21/Git_01_安装/" class="next">Git 环境搭建</a></div><div id="comments"></div></div></div></div><div class="layout-r"><div id="sidebar"><div class="search-pla"></div><div id="toc" class="widget"><div class="widget-title"><i class="fa fa-fei">文章目录</i></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#安装"><span class="toc-text">安装</span></a></li></ol></div><div class="widget"><div class="widget-title"><i class="fa fa-xie"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/04/23/常用命令_top/">Linux常用命令(top)</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/23/常用命令_htop/">htop</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/21/Git_01_安装/">Git 环境搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/20/Git_02_基本使用/">Git 基本使用（TortoiseGit）</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/16/Nginx_02_配置文件/">Nginx 配置文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/16/Redis_07_集群/">Redis 集群</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/28/Docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/SpringCloud_01_Eureka/">Spring Cloud Eureka 服务发现</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Thymeleaf_01/">Thymeleaf 教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Svn服务器搭建/">Linux Svn 服务器搭建</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-biao"> 标签</i></div><div class="tagcloud"><a href="/tags/Nginx/" style="font-size: 15px;">Nginx</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/JPA/" style="font-size: 15px;">JPA</a> <a href="/tags/Idea/" style="font-size: 15px;">Idea</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Mac/" style="font-size: 15px;">Mac</a> <a href="/tags/MySql/" style="font-size: 15px;">MySql</a> <a href="/tags/Git/" style="font-size: 15px;">Git</a> <a href="/tags/Redis/" style="font-size: 15px;">Redis</a> <a href="/tags/Tool/" style="font-size: 15px;">Tool</a> <a href="/tags/Spring-Cloud/" style="font-size: 15px;">Spring Cloud</a> <a href="/tags/Spring-Boot/" style="font-size: 15px;">Spring-Boot</a> <a href="/tags/Svn/" style="font-size: 15px;">Svn</a> <a href="/tags/Thymeleaf/" style="font-size: 15px;">Thymeleaf</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-archive"> 归档</i></div><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li></ul></div></div></div></div><a id="totop" href="#top"></a><div id="footer"><div class="footer-info"><p><a href="/baidusitemap.xml">Baidu Site Haritası</a> |  <a href="/atom.xml">订阅</a> |  <a href="/about/">关于</a></p><p>本站总访问量：<i id="busuanzi_container_site_pv"><i id="busuanzi_value_site_pv"></i></i>次</p><p><span> Copyright &copy;<a href="/." rel="nofollow">Huangkai.</a></span><span> Theme by<a rel="nofollow" target="_blank" href="https://github.com/chaooo/hexo-theme-BlueLake"> BlueLake.</a></span><span> Count by<a href="http://busuanzi.ibruce.info/"> busuanzi.</a></span><span> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a></span></p></div></div></div><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><script type="text/javascript" src="/js/search.json.js?v=2.0.1"></script><script type="text/javascript" src="/js/toctotop.js?v=2.0.1" async></script><script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":["mshare","weixin","tsina","qzone","linkedin","fbook","twi","print","renren","sqq","evernotecn","bdysc","tqq","tqf","bdxc","kaixin001","tieba","douban","bdhome","thx","ibaidu","meilishuo","mogujie","diandian","huaban","duitang","hx","fx","youdao","sdo","qingbiji","people","xinhua","mail","isohu","yaolan","wealink","ty","iguba","h163","copy"],"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{},"image":{"viewList":["tsina","qzone","weixin","fbook","twi","linkedin","youdao","evernotecn","mshare"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["tsina","qzone","weixin","fbook","twi","linkedin","youdao","evernotecn","mshare"]}};with(document)0[(getElementsByTagName('head')[0]||head).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script></body></html>

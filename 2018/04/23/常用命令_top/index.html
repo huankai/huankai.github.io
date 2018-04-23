@@ -1,0 +1,227 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="Huangkai,huankai"><title>Linux常用命令(top) | HuangkaiのBlog</title><link rel="stylesheet" type="text/css" href="//fonts.neworld.org/css?family=Source+Code+Pro"><link rel="stylesheet" type="text/css" href="/css/style.css?v=2.0.1"><link rel="stylesheet" type="text/css" href="/css/highlight.css?v=2.0.1"><link rel="Shortcut Icon" href="/favicon.ico"><link rel="bookmark" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Linux常用命令(top)</h1><a id="logo" href="/.">HuangkaiのBlog</a><p class="description">学而不思则罔 思而不学则殆</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div><div id="search-form"><div id="result-mask" class="hide"></div><label><input id="search-key" type="text" autocomplete="off" placeholder="Arama"></label><div id="result-wrap" class="hide"><div id="search-result"></div></div><div class="hide"><template id="search-tpl"><div class="item"><a href="/{path}" title="{title}"><div class="title">{title}</div><div class="time">{date}</div><div class="tags">{tags}</div></a></div></template></div></div></div><div id="layout" class="layout-g"><div class="layout-l"><div class="content_container"><div class="post"><h1 class="post-title">Linux常用命令(top)</h1><div class="post-meta"><a href="/2018/04/23/常用命令_top/#comments" class="comment-count"></a><p><span class="date">Apr 23, 2018</span><span><i id="busuanzi_container_page_pv"><i id="busuanzi_value_page_pv"></i><i>点击</i></i></span></p></div><div class="post-content"><p>top 命令是 Linux 下常用的性能分析工具，能够实时显示系统中各个进程的资源占用状况，类似于 Windows 的任务管理器。</p>
+<p>top用于动态监控进程所占系统资源，每隔3秒变一次。这个命令的特点是把占用系统资源（CPU，内存，磁盘IO等）最高的进程放到最前面。top命令打印出了很多信息，包括系统负载（loadaverage）、进程数（Tasks）、cpu使用情况、内存使用情况以及交换分区使用情况。</p>
+<p>命令内容详解：<br>在命令行输入 <code>top</code> 显示如下<br><img src="https://raw.githubusercontent.com/huankai/blog-resources/master/photos/Linux/top_01.png" alt=""></p>
+<h1 id="第一行"><a href="#第一行" class="headerlink" title="第一行"></a>第一行</h1><p>系统信息：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字符</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>top - 15:35:56</code></td>
+<td style="text-align:center">当前系统时间</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>up 1:30</code></td>
+<td style="text-align:center">系统已运行时间</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>2 users</code></td>
+<td style="text-align:center">在线用户,包含系统用户</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>load average: 0.01, 0.03, 0.05</code></td>
+<td style="text-align:center">系统负载。三个数值分别为 1分钟、5分钟、15分钟前到现在的平均值。</td>
+</tr>
+</tbody>
+</table>
+<h1 id="第二行"><a href="#第二行" class="headerlink" title="第二行"></a>第二行</h1><p>系统进程信息</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字符</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>Tasks:  92 total</code></td>
+<td style="text-align:center">总进程数</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>2 running</code></td>
+<td style="text-align:center">运行进程数</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>91 sleeping</code></td>
+<td style="text-align:center">睡眠进程数</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>0 stopped</code></td>
+<td style="text-align:center">停止进程数</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>0 zombie</code></td>
+<td style="text-align:center">僵尸进程数</td>
+</tr>
+</tbody>
+</table>
+<p>僵尸进程 ：一个子进程在其父进程没有调用wait()或waitpid()的情况下，这个进程就是僵尸进程，如果其父进程还存在一直不调用wait()，则该僵尸进程将无法回收，等到父进程退出后该进程被init回收。</p>
+<h1 id="第三行"><a href="#第三行" class="headerlink" title="第三行"></a>第三行</h1><p>Cpu使用信息</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字符</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>%Cpu(s):  0.0 us</code></td>
+<td style="text-align:center">cpu占用率(%)，用户进程占用cpu百分率</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>0.7 sy</code></td>
+<td style="text-align:center">系统占用CPU百分比</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>0.0 ni</code></td>
+<td style="text-align:center">用户进程空间内改变过优先级的进程占用CPU百分比</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>99.3 id</code></td>
+<td style="text-align:center">cpu空闲率</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>0.0 wa</code></td>
+<td style="text-align:center">等待IO的CPU时间百分比</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>0.0 hi</code></td>
+<td style="text-align:center">硬中断（Hardware IRQ）占用CPU的百分比</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>0.0 si</code></td>
+<td style="text-align:center">软中断（Software Interrupts）占用CPU的百分比</td>
+</tr>
+</tbody>
+</table>
+<h1 id="第四行"><a href="#第四行" class="headerlink" title="第四行"></a>第四行</h1><p>内存使用信息</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字符</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>KiB Mem :   999936 total</code></td>
+<td style="text-align:center">内存总量</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>391636 free</code></td>
+<td style="text-align:center">系统空闲内存大小</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>170252 used</code></td>
+<td style="text-align:center">系统使用内存大小</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>438048 buff/cache</code></td>
+<td style="text-align:center">缓存大小</td>
+</tr>
+</tbody>
+</table>
+<h1 id="第五行"><a href="#第五行" class="headerlink" title="第五行"></a>第五行</h1><p>Swap内存信息</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字符</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>KiB Swap:  1048572 total</code></td>
+<td style="text-align:center">Swap 总量</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>1048572 free</code></td>
+<td style="text-align:center">Swap空闲量</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>0 used</code></td>
+<td style="text-align:center">Swap使用量</td>
+</tr>
+</tbody>
+</table>
+<h1 id="第六行"><a href="#第六行" class="headerlink" title="第六行"></a>第六行</h1><p>进程信息</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">字符</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>PID</code></td>
+<td style="text-align:center">进程pid</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>USER</code></td>
+<td style="text-align:center">进程所属用户</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>PR</code></td>
+<td style="text-align:center">进程优先级</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>NI</code></td>
+<td style="text-align:center">nice值。越小优先级越高，最小-20，最大20（用户设置最大19）</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>VIRT</code></td>
+<td style="text-align:center">进程使用的虚拟内存总量，单位kb。VIRT=SWAP+RES</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>RES</code></td>
+<td style="text-align:center">进程使用的、未被换出的物理内存大小，单位kb。RES=CODE+DATA</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>SHR</code></td>
+<td style="text-align:center">共享内存大小，单位kb</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>S</code></td>
+<td style="text-align:center">进程状态。D=不可中断的睡眠状态 R=运行 S=睡眠 T=跟踪/停止 Z=僵尸进程</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>%CPU</code></td>
+<td style="text-align:center">进程占用cpu百分比</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>%MEM</code></td>
+<td style="text-align:center">进程占用内存百分比</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>TIME+</code></td>
+<td style="text-align:center">进程运行时间</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>COMMAND</code></td>
+<td style="text-align:center">进程名称</td>
+</tr>
+</tbody>
+</table>
+<p>top 常用交互命令(进入top后使用):</p>
+<ul>
+<li><strong>c</strong> 换显示命令名称和完整命令行</li>
+<li><strong>M</strong> 根据内存大小排序</li>
+<li><strong>P</strong> 根据CPU大小排序</li>
+<li><strong>T</strong> 根据时间大小排序</li>
+<li><strong>u</strong> 输入指定用户名后，查看输入用户名的进程</li>
+<li><strong>q</strong> 退出top</li>
+<li><strong>1</strong> 注意：是数字1，不是字母l，监控每个逻辑CPU的状况(对于多核CPU时)</li>
+<li><strong>b</strong> 打开/关闭高亮效果</li>
+<li><strong>i</strong> 忽略闲置和僵死进程。这是一个开关式命令</li>
+<li><strong>k</strong> 终止指定的进程。按下k键–&gt;再输入要杀死的进程的pid–&gt;按enter键–&gt;(选择信号类型，以数字标示，默认15为杀死)本步可省略按enter键（常用为-9）</li>
+</ul>
+<p>kill 信号大全详见: <a href="https://www.2cto.com/os/201202/119425.html" target="_blank" rel="noopener">https://www.2cto.com/os/201202/119425.html</a></p>
+<p>扩展：比 <code>top</code> 更好使用的工具: <code>htop</code></p>
+</div><div class="tags"><a href="/tags/Linux/">Linux</a></div><div class="post-share"><div class="bdsharebuttonbox"><span style="float:left;line-height: 28px;height: 28px;font-size:16px;font-weight:blod">分享到：</span><a href="#" data-cmd="more" class="bds_more"></a><a href="#" data-cmd="mshare" title="分享到一键分享" class="bds_mshare"></a><a href="#" data-cmd="fbook" title="分享到Facebook" class="bds_fbook"></a><a href="#" data-cmd="twi" title="分享到Twitter" class="bds_twi"></a><a href="#" data-cmd="linkedin" title="分享到linkedin" class="bds_linkedin"></a><a href="#" data-cmd="youdao" title="分享到有道云笔记" class="bds_youdao"></a><a href="#" data-cmd="evernotecn" title="分享到印象笔记" class="bds_evernotecn"></a><a href="#" data-cmd="weixin" title="分享到微信" class="bds_weixin"></a><a href="#" data-cmd="qzone" title="分享到QQ空间" class="bds_qzone"></a><a href="#" data-cmd="tsina" title="分享到新浪微博" class="bds_tsina"></a></div></div><div class="post-nav"><a href="/2018/04/23/常用命令_htop/" class="next">htop</a></div><div id="comments"></div></div></div></div><div class="layout-r"><div id="sidebar"><div class="search-pla"></div><div id="toc" class="widget"><div class="widget-title"><i class="fa fa-fei">文章目录</i></div><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#第一行"><span class="toc-text">第一行</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#第二行"><span class="toc-text">第二行</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#第三行"><span class="toc-text">第三行</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#第四行"><span class="toc-text">第四行</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#第五行"><span class="toc-text">第五行</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#第六行"><span class="toc-text">第六行</span></a></li></ol></div><div class="widget"><div class="widget-title"><i class="fa fa-xie"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/04/23/常用命令_top/">Linux常用命令(top)</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/23/常用命令_htop/">htop</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/21/Git_01_安装/">Git 环境搭建</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/20/Git_02_基本使用/">Git 基本使用（TortoiseGit）</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/16/Nginx_02_配置文件/">Nginx 配置文件</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/03/16/Redis_07_集群/">Redis 集群</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/28/Docker/">Docker</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/SpringCloud_01_Eureka/">Spring Cloud Eureka 服务发现</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Thymeleaf_01/">Thymeleaf 教程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/02/22/Svn服务器搭建/">Linux Svn 服务器搭建</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-biao"> 标签</i></div><div class="tagcloud"><a href="/tags/Nginx/" style="font-size: 15px;">Nginx</a> <a href="/tags/Docker/" style="font-size: 15px;">Docker</a> <a href="/tags/JPA/" style="font-size: 15px;">JPA</a> <a href="/tags/Idea/" style="font-size: 15px;">Idea</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Mac/" style="font-size: 15px;">Mac</a> <a href="/tags/MySql/" style="font-size: 15px;">MySql</a> <a href="/tags/Git/" style="font-size: 15px;">Git</a> <a href="/tags/Redis/" style="font-size: 15px;">Redis</a> <a href="/tags/Tool/" style="font-size: 15px;">Tool</a> <a href="/tags/Spring-Cloud/" style="font-size: 15px;">Spring Cloud</a> <a href="/tags/Spring-Boot/" style="font-size: 15px;">Spring-Boot</a> <a href="/tags/Svn/" style="font-size: 15px;">Svn</a> <a href="/tags/Thymeleaf/" style="font-size: 15px;">Thymeleaf</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-archive"> 归档</i></div><ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a></li></ul></div></div></div></div><a id="totop" href="#top"></a><div id="footer"><div class="footer-info"><p><a href="/baidusitemap.xml">Baidu Site Haritası</a> |  <a href="/atom.xml">订阅</a> |  <a href="/about/">关于</a></p><p>本站总访问量：<i id="busuanzi_container_site_pv"><i id="busuanzi_value_site_pv"></i></i>次</p><p><span> Copyright &copy;<a href="/." rel="nofollow">Huangkai.</a></span><span> Theme by<a rel="nofollow" target="_blank" href="https://github.com/chaooo/hexo-theme-BlueLake"> BlueLake.</a></span><span> Count by<a href="http://busuanzi.ibruce.info/"> busuanzi.</a></span><span> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a></span></p></div></div></div><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><script type="text/javascript" src="/js/search.json.js?v=2.0.1"></script><script type="text/javascript" src="/js/toctotop.js?v=2.0.1" async></script><script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":["mshare","weixin","tsina","qzone","linkedin","fbook","twi","print","renren","sqq","evernotecn","bdysc","tqq","tqf","bdxc","kaixin001","tieba","douban","bdhome","thx","ibaidu","meilishuo","mogujie","diandian","huaban","duitang","hx","fx","youdao","sdo","qingbiji","people","xinhua","mail","isohu","yaolan","wealink","ty","iguba","h163","copy"],"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{},"image":{"viewList":["tsina","qzone","weixin","fbook","twi","linkedin","youdao","evernotecn","mshare"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["tsina","qzone","weixin","fbook","twi","linkedin","youdao","evernotecn","mshare"]}};with(document)0[(getElementsByTagName('head')[0]||head).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script></body></html>
